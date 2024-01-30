@@ -25,7 +25,7 @@ module Api
               thumbnail: recipe['strMealThumb']
             },
             links: {
-              self: { href: "http://localhost:3000/categories/#{params[:category_id]}/recipe/#{recipe['idMeal']}" },
+              self: { href: "http://localhost:3000/recipe/#{recipe['idMeal']}" },
               category: { href: "http://localhost:3000/categories/#{params[:category_id]}" }
             }
           }
@@ -40,36 +40,35 @@ module Api
       def decorate_recipe(recipe_as_json)
         recipe = recipe_as_json&.[]('meals')&.first
 
-        if recipe
-          decorated_recipe = {
-            id: recipe['idMeal'],
-            type: 'recipe',
-            attributes: {
-              name: recipe['strMeal'],
-              category: recipe['strCategory'],
-              area: recipe['strArea'],
-              instructions: recipe['strInstructions'],
-              tags: recipe['strTags'].split(','),
-              ingredients: get_ingredients(recipe),
-              dateModified: recipe['strDateModified']
-            },
-            links: {
-              self: { href: "http://localhost:3000/categories/#{params[:category_id]}/recipe/#{params[:id]}" },
-              category: { href: "http://localhost:3000/categories/#{params[:category_id]}" },
-              thumbnail: { href: recipe['strMealThumb'] },
-              imageSource: { href: recipe['strImageSource'] },
-              source: { href: recipe['strSource'] },
-              youtube: { href: recipe['youtube'] }
-            }
-          }
-        else
-          decorated_recipe = {}
-        end
+        decorated_recipe = if recipe
+                             {
+                               id: recipe['idMeal'],
+                               type: 'recipe',
+                               attributes: {
+                                 name: recipe['strMeal'],
+                                 category: recipe['strCategory'],
+                                 area: recipe['strArea'],
+                                 instructions: recipe['strInstructions'],
+                                 tags: recipe['strTags'].split(','),
+                                 ingredients: get_ingredients(recipe),
+                                 dateModified: recipe['strDateModified']
+                               },
+                               links: {
+                                 self: { href: "http://localhost:3000/recipes/#{params[:id]}" },
+                                 thumbnail: { href: recipe['strMealThumb'] },
+                                 imageSource: { href: recipe['strImageSource'] },
+                                 source: { href: recipe['strSource'] },
+                                 youtube: { href: recipe['youtube'] }
+                               }
+                             }
+                           else
+                             {}
+                           end
 
         {
           data: decorated_recipe,
           links: {
-            self: { href: "http://localhost:3000/api/v1/categories/#{params[:category_id]}/recipe/#{params[:id]}" }
+            self: { href: "http://localhost:3000/api/v1/recipes/#{params[:id]}" }
           }
         }
       end
